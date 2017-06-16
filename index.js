@@ -45,6 +45,47 @@ app.get('/hello', function(req, res) {
   res.render('hello', { message: 'Congrats, you just set up your app!' });
 });
 
+var basicAuth = express.basicAuth('login','password');
+app.get('/config', basicAuth, function(req, res) {
+  getConfig(function(live, userpass){
+    res.json({live: live, userpass: userpass})
+  })
+})
+
+app.post('/payment', function(req, res){
+  var payment = req.body;
+
+  // var isCardToken = (strStartsWith(token, 'adyen')) ? true : false;
+  // var buf = new Buffer(payment.paymentData, 'base64');
+  // var paymentData = JSON.parse(buf.toString());
+
+  console.log('Payment ' + payment.currency + " " + payment.amount);
+
+  getConfig(function(live, userpass){
+    var config = {live: live, userpass: userpass}
+
+    authorisePayment(payment, config, function(json, error){
+      if (!json) json = {}
+      var psp = (json.pspReference) ? json.pspReference : null;
+      var status = (json.resultCode) ? json.resultCode : error.toString();
+
+      parseSavePayment(payment.amount, payment.currency, payment.reference, psp, status, json, function() {
+        //console.log('Payment saved ' + psp)
+
+        if (psp && status == 'Authorised') {
+          console.log('Payment OK: ' + psp + " " + status);
+          res.status(200).json(json);
+        } else {
+          res.status(400).json(json);
+        }
+
+      })
+    });
+
+  })
+
+})
+
 // There will be a test page available on the /test path of your server url
 // Remove this before launching your app
 app.get('/test', function(req, res) {
