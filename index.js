@@ -45,8 +45,9 @@ app.get('/hello', function(req, res) {
   res.render('hello', { message: 'Congrats, you just set up your app!' });
 });
 
-var basicAuth = express.basicAuth('login','password');
-app.get('/config', basicAuth, function(req, res) {
+var basicAuth = require('basic-auth-connect');
+var basicAuthRes = basicAuth('login','password');
+app.get('/config', basicAuthRes, function(req, res) {
   getConfig(function(live, userpass){
     res.json({live: live, userpass: userpass})
   })

@@ -13,7 +13,8 @@
     "kerberos": "~0.0.x",
     "parse": "~1.8.0",
     "parse-server": "*",
-    "ejs": "~2.5.6"
+    "ejs": "~2.5.6",
+    "basic-auth-connect": "*"
   },
   "scripts": {
     "start": "node index.js"
