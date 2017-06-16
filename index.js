@@ -48,9 +48,15 @@ app.get('/hello', function(req, res) {
 var basicAuth = require('basic-auth-connect');
 var basicAuthRes = basicAuth('login','password');
 app.get('/config', basicAuthRes, function(req, res) {
+  Parse.Config.get().then(function(config_params){
+    console.log(config_params);
+    res.json({param: config_params});
+  });
+  /*
   getConfig(function(live, userpass){
     res.json({live: live, userpass: userpass})
   })
+  */
 })
 
 app.post('/payment', function(req, res){
